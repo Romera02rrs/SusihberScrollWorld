@@ -84,70 +84,20 @@ html.js [data-reveal].is-visible {
   filter: none;
 }
 
-/* Motor scroll-world: tema Sushiber. Fuera de capa, gana a los estilos @layer sw del motor. */
-.sw-root {
-  --sw-bg: #131209;
-  --sw-ink: #f3eadb;
-  --sw-ink-soft: #bdb3a3;
-  --sw-accent: #d0703a;
-  --sw-font-display: "Hina Mincho", serif;
-  --sw-font-body: "Zen Kaku Gothic New", system-ui, sans-serif;
+/* Recorrido: solo la tarjeta de la parada activa se ve sobre el vídeo. */
+html.js [data-stop-card] {
+  opacity: 0;
+  transform: translateY(4rem);
+  filter: blur(12px);
+  transition:
+    opacity 900ms var(--ease-fluid),
+    transform 900ms var(--ease-fluid),
+    filter 900ms var(--ease-fluid);
 }
-.sw-topbar,
-.sw-particles {
-  display: none;
-}
-/* Capa plana para leer el texto sobre el vídeo (sin degradados). */
-.sw-copylayer::before {
-  width: 100%;
-  height: 100%;
-  top: 0;
-  bottom: auto;
-  background: rgb(19 18 9 / 0.55);
-}
-/* El motor sobrescribe `transform` en línea, así que el centrado vertical va con flex. */
-.sw-copy {
-  width: min(46vw, 560px);
-  top: 0;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-shadow: 0 1px 16px rgb(19 18 9 / 0.8);
-}
-.sw-copy:has(h1) {
-  width: min(56vw, 680px);
-}
-.sw-scrollbar {
-  height: 2px;
-}
-.sw-route__label {
-  color: var(--color-crema);
-  background: rgb(19 18 9 / 0.8);
-  border-color: rgb(243 234 219 / 0.1);
-  font-weight: 400;
-}
-.sw-hint {
-  letter-spacing: 0.14em;
-}
-@media (max-width: 860px) {
-  /* Móvil: el motor ancla el texto abajo; se deja hueco a la derecha para el indicador. */
-  .sw-copy,
-  .sw-copy:has(h1) {
-    width: auto;
-    top: auto;
-    bottom: calc(clamp(56px, 12dvh, 110px) + env(safe-area-inset-bottom));
-    display: block;
-    right: 3rem;
-  }
-  .sw-copylayer::before {
-    height: 100%;
-    background: rgb(19 18 9 / 0.55);
-  }
-  /* El aviso del motor se solaparía con el CTA del hero, que en móvil va abajo. */
-  .sw-hint {
-    display: none;
-  }
+html.js [data-stop][data-active] [data-stop-card] {
+  opacity: 1;
+  transform: none;
+  filter: none;
 }
 
 /* Tagline: cada palabra pasa de apagada a crema. */
@@ -160,7 +110,8 @@ html.js [data-reveal].is-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html.js [data-reveal] {
+  html.js [data-reveal],
+  html.js [data-stop-card] {
     transform: none;
     filter: none;
     transition: opacity 400ms var(--ease-fluid);

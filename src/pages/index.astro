@@ -52,21 +52,16 @@ const faqSchema = {
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} />
 
   <SiteHeader />
-  <main id="contenido">
+  <main>
     <World />
-    <!-- Por encima de las capas fijas del motor scroll-world (z 10–60) -->
-    <div class="relative z-[45] bg-tinta">
-      <Tagline />
-      <Carta />
-      <Reservar />
-      <Bono />
-      <Faq />
-      <Contacto />
-    </div>
+    <Tagline />
+    <Carta />
+    <Reservar />
+    <Bono />
+    <Faq />
+    <Contacto />
   </main>
-  <div class="relative z-[45] bg-tinta">
-    <SiteFooter />
-  </div>
+  <SiteFooter />
 </Layout>
 
 <script>

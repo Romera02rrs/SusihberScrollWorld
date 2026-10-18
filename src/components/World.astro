@@ -1,7 +1,7 @@
 ---
 import { getImage } from 'astro:assets';
+import ArrowDown from '@phosphor-icons/core/assets/regular/arrow-down.svg';
 import ArrowRight from '@phosphor-icons/core/assets/regular/arrow-right.svg';
-import WhatsappLogo from '@phosphor-icons/core/assets/regular/whatsapp-logo.svg';
 import parada1 from '../assets/world/parada-1.jpg';
 import parada2 from '../assets/world/parada-2.jpg';
 import parada3 from '../assets/world/parada-3.jpg';
@@ -14,179 +14,184 @@ import parada4m from '../assets/world/parada-4-movil.jpg';
 import parada5m from '../assets/world/parada-5-movil.jpg';
 import { CONTACT, LINKS } from '../data/sushiber';
 
-// Motor scroll-world: cada parada es una escena fija (fotograma clave de una foto real) y
-// los 4 clips son los conectores entre paradas. Los pósters se extraen de esos mismos
-// conectores, así cada costura coincide con el vídeo.
-const paradas = [
-  { id: 'llegada', label: 'Llegada', desktop: parada1, mobile: parada1m, scroll: 1.2 },
-  { id: 'barra', label: 'La barra', desktop: parada2, mobile: parada2m, scroll: 1 },
-  { id: 'sala', label: 'La sala', desktop: parada3, mobile: parada3m, scroll: 1 },
-  { id: 'comedor', label: 'El comedor', desktop: parada4, mobile: parada4m, scroll: 1.1 },
-  { id: 'cocina', label: 'La cocina', desktop: parada5, mobile: parada5m, scroll: 1.2 },
-];
+// Cada parada coincide con el fotograma clave de una foto real del local.
+// El vídeo son 4 tramos de 5,1667 s concatenados (20,67 s en total).
+const SEGMENT = 5.1667;
 
-const sections = await Promise.all(
-  paradas.map(async (p) => ({
-    id: p.id,
-    label: p.label,
-    scroll: p.scroll,
-    template: `sw-copy-${p.id}`,
-    still: (await getImage({ src: p.desktop, width: 1920, format: 'webp', quality: 85 })).src,
-    stillMobile: (await getImage({ src: p.mobile, width: 720, format: 'webp', quality: 85 })).src,
+const stops = [
+  { id: 'llegada', label: 'Llegada', desktop: parada1, mobile: parada1m, alt: 'Fachada de Sushiber de noche, con el rótulo iluminado sobre la entrada' },
+  { id: 'barra', label: 'La barra', desktop: parada2, mobile: parada2m, alt: 'Barra de Sushiber iluminada desde abajo, con botellas y copas a la vista' },
+  { id: 'sala', label: 'La sala', desktop: parada3, mobile: parada3m, alt: 'Entrada a la sala bajo un noren azul con caligrafía japonesa' },
+  { id: 'comedor', label: 'El comedor', desktop: parada4, mobile: parada4m, alt: 'Comedor con mesas redondas de madera y una hornacina en arco iluminada en rojo' },
+  { id: 'cocina', label: 'La cocina', desktop: parada5, mobile: parada5m, alt: 'Barra de cocina con estanterías de cerámica y luz cálida' },
+].map((stop, i) => ({ ...stop, time: Math.min(i * SEGMENT, 20.62) }));
+
+const posters = await Promise.all(
+  stops.map(async (stop) => ({
+    desktop: await getImage({ src: stop.desktop, width: 1920, format: 'webp', quality: 72 }),
+    mobile: await getImage({ src: stop.mobile, width: 720, format: 'webp', quality: 72 }),
   })),
 );
 
-const config = {
-  sections,
-  connectors: [1, 2, 3, 4].map((n) => `/videos/world/conector-${n}.mp4`),
-  connectorsMobile: [1, 2, 3, 4].map((n) => `/videos/world/conector-${n}-movil.mp4`),
-  diveScroll: 1,
-  connScroll: 1.4,
-  crossfade: 0.08,
-  hint: 'Desliza para recorrer el restaurante',
-  nav: false,
-  atmosphere: false,
-  stillMotion: false,
-};
-
-const total = String(paradas.length).padStart(2, '0');
-const counter = (i: number) => `${String(i + 1).padStart(2, '0')} / ${total}`;
+const card = 'rounded-3xl border border-crema/10 bg-tinta/75 p-6 backdrop-blur-md md:p-8';
 ---
 
-<section id="recorrido" aria-label="Recorrido por el restaurante" data-world data-config={JSON.stringify(config)}></section>
+<section id="recorrido" aria-label="Recorrido por el restaurante" class="relative" data-world>
+  <!-- Escenario fijo: vídeo de fondo controlado por el scroll -->
+  <div class="sticky top-0 h-svh w-full overflow-hidden" data-world-stage aria-hidden="true">
+    {
+      stops.map((stop, i) => (
+        <picture
+          class:list={[
+            'absolute inset-0 transition-opacity duration-700 ease-fluid',
+            i === 0 ? 'opacity-100' : 'opacity-0',
+          ]}
+          data-poster={i}
+        >
+          <source media="(max-aspect-ratio: 1/1)" srcset={posters[i].mobile.src} />
+          <img
+            src={posters[i].desktop.src}
+            alt=""
+            class="size-full object-cover"
+            loading={i === 0 ? 'eager' : 'lazy'}
+            fetchpriority={i === 0 ? 'high' : 'auto'}
+            decoding="async"
+          />
+        </picture>
+      ))
+    }
 
-<!-- 01 · Llegada (hero) -->
-<template id="sw-copy-llegada">
-  <p class="text-xs tracking-[0.14em] text-crema-suave uppercase">
-    {counter(0)} <span class="text-teja">•</span> Llegada
-  </p>
-  <p class="mt-4 text-sm text-crema-suave">{CONTACT.street} · {CONTACT.city}</p>
-  <h1 class="mt-4 bg-linear-to-r from-crema to-crema-tenue bg-clip-text text-5xl text-transparent md:text-7xl">
-    Cocina japonesa fusión<br class="hidden md:inline" /> en Dénia
-  </h1>
-  <p class="mt-6 text-base text-crema-suave md:text-lg">
-    Sushi creativo que une Japón con sabores mediterráneos y peruanos, elaborado de forma artesanal y al momento.
-  </p>
-  <div class="mt-8 flex flex-wrap items-center gap-6">
-    <a
-      href={LINKS.reservar}
-      class="rounded-full bg-teja px-3 py-2 text-base font-medium text-tinta transition-all duration-700 ease-fluid hover:scale-[1.03] hover:bg-teja-claro active:scale-[0.98]"
-    >
-      Reservar mesa
-    </a>
-    <p class="text-sm text-crema-suave">En Dénia desde 2018</p>
+    <video
+      data-world-video
+      data-src="/videos/world/recorrido-1080.mp4"
+      data-src-mobile="/videos/world/recorrido-movil-720.mp4"
+      class="absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-700 ease-fluid"
+      muted
+      playsinline
+      preload="none"
+      disablepictureinpicture
+      tabindex="-1"
+    ></video>
+
+    <div class="absolute inset-0 bg-tinta/30"></div>
+
+    <!-- Indicador del recorrido -->
+    <ol class="absolute top-1/2 right-6 hidden -translate-y-1/2 flex-col gap-4 lg:flex">
+      {
+        stops.map((stop, i) => (
+          <li class="group flex items-center justify-end gap-3" data-rail={i}>
+            <span class="text-xs text-crema-suave opacity-0 transition-opacity duration-700 ease-fluid group-data-active:opacity-100">
+              {stop.label}
+            </span>
+            <span class="size-2 rounded-full bg-crema/30 transition-all duration-700 ease-fluid group-data-active:scale-150 group-data-active:bg-teja" />
+          </li>
+        ))
+      }
+    </ol>
   </div>
-</template>
 
-<!-- 02 · La barra: cifra destacada -->
-<template id="sw-copy-barra">
-  <p class="text-xs tracking-[0.14em] text-crema-suave uppercase">
-    {counter(1)} <span class="text-teja">•</span> La barra
-  </p>
-  <p class="mt-4 text-sm tracking-[0.14em] text-teja uppercase">Bienvenida</p>
-  <h2 class="mt-4 text-4xl md:text-6xl">Luz cálida al entrar</h2>
-  <p class="mt-4 text-base text-crema-suave md:text-lg">
-    Te recibe una barra iluminada desde abajo, con las botellas y las copas a la vista.
-  </p>
-  <div class="mt-8 flex items-center gap-6">
-    <p class="font-display text-7xl text-teja md:text-8xl">2018</p>
-    <p class="max-w-48 text-sm text-crema-suave">Abrimos nuestras puertas en Dénia un 10 de marzo.</p>
-  </div>
-</template>
-
-<!-- 03 · La sala: dos tarjetas -->
-<template id="sw-copy-sala">
-  <p class="text-xs tracking-[0.14em] text-crema-suave uppercase">
-    {counter(2)} <span class="text-teja">•</span> La sala
-  </p>
-  <p class="mt-4 text-sm tracking-[0.14em] text-teja uppercase">Nuestra propuesta</p>
-  <h2 class="mt-4 text-4xl md:text-6xl">Japón, con acento mediterráneo y peruano</h2>
-  <p class="mt-4 text-base text-crema-suave md:text-lg">
-    Partimos de la cocina japonesa y la cruzamos con sabores mediterráneos y peruanos.
-  </p>
-  <ul class="mt-8 grid grid-cols-2 gap-4">
-    <li class="rounded-2xl border border-crema/15 p-4 md:p-6">
-      <p class="font-display text-xl md:text-3xl">Leche de tigre</p>
-      <p class="mt-2 text-sm text-crema-suave">Marina el atún de nuestro Acevichado roll</p>
-    </li>
-    <li class="rounded-2xl border border-crema/15 p-4 md:p-6">
-      <p class="font-display text-xl md:text-3xl">Ají amarillo</p>
-      <p class="mt-2 text-sm text-crema-suave">En la crema del Japan in Perú</p>
-    </li>
-  </ul>
-</template>
-
-<!-- 04 · El comedor: pasos numerados -->
-<template id="sw-copy-comedor">
-  <p class="text-xs tracking-[0.14em] text-crema-suave uppercase">
-    {counter(3)} <span class="text-teja">•</span> El comedor
-  </p>
-  <p class="mt-4 text-sm tracking-[0.14em] text-teja uppercase">Reservas</p>
-  <h2 class="mt-4 text-4xl md:text-6xl">Tu mesa, para dos o para el grupo</h2>
-  <ol class="mt-6 flex flex-col gap-4">
-    <li class="flex gap-4">
-      <span class="font-display text-3xl text-teja">1</span>
-      <div>
-        <p class="font-display text-xl">Reserva online</p>
-        <p class="mt-1 text-sm text-crema-suave">Elige día y hora en nuestro sistema de reservas.</p>
-      </div>
-    </li>
-    <li class="flex gap-4">
-      <span class="font-display text-3xl text-teja">2</span>
-      <div>
-        <p class="font-display text-xl">Más de {CONTACT.groupThreshold} personas</p>
-        <p class="mt-1 text-sm text-crema-suave">
-          Reserva por teléfono en el{' '}
-          <a
-            href={CONTACT.phoneHref}
-            class="text-crema underline decoration-teja underline-offset-4 transition-colors duration-700 ease-fluid hover:text-teja"
+  <!-- Paradas: el texto se mantiene fijo mientras el vídeo avanza entre ellas -->
+  <div class="relative -mt-[100svh]" id="contenido">
+    {/* 1 · Llegada (hero) */}
+    <article id="top" class="relative h-[150svh]" data-stop="0" data-time={stops[0].time} aria-labelledby="hero-title">
+      <div class="sticky top-0 flex h-svh items-end px-4 pb-6 md:items-center md:px-16 md:pb-0">
+        <div class:list={[card, 'max-w-[680px]']} data-stop-card>
+          <p class="text-sm text-crema-suave">
+            {CONTACT.street} · {CONTACT.city}
+          </p>
+          <h1
+            id="hero-title"
+            class="mt-4 bg-linear-to-r from-crema to-crema-tenue bg-clip-text text-5xl text-transparent md:text-7xl"
           >
-            {CONTACT.phoneDisplay}
-          </a>.
-        </p>
+            Cocina japonesa fusión<br class="hidden md:inline" /> en Dénia
+          </h1>
+          <p class="mt-6 max-w-[680px] text-base text-crema-suave md:text-lg">
+            Sushi creativo que une Japón con sabores mediterráneos y peruanos, elaborado de forma artesanal y al momento.
+          </p>
+          <div class="mt-8 flex flex-wrap items-center gap-6">
+            <a
+              href={LINKS.reservar}
+              class="rounded-full bg-teja px-3 py-2 text-base font-medium text-tinta transition-all duration-700 ease-fluid hover:scale-[1.03] hover:bg-teja-claro active:scale-[0.98]"
+            >
+              Reservar mesa
+            </a>
+            <p class="text-sm text-crema-suave">En Dénia desde 2018</p>
+          </div>
+        </div>
       </div>
-    </li>
-  </ol>
-  <a
-    href={LINKS.whatsapp}
-    class="mt-6 hidden w-max items-center gap-2 rounded-full border border-teja/60 px-4 py-2 text-sm text-teja transition-colors duration-700 ease-fluid hover:border-teja hover:bg-teja/10 md:inline-flex"
-  >
-    <WhatsappLogo class="size-4" aria-hidden="true" />
-    ¿Dudas antes de reservar? Escríbenos por WhatsApp
-  </a>
-  <div class="mt-6">
-    <a
-      href={LINKS.reservar}
-      class="inline-block rounded-full bg-teja px-3 py-2 text-base font-medium text-tinta transition-all duration-700 ease-fluid hover:scale-[1.03] hover:bg-teja-claro active:scale-[0.98]"
-    >
-      Reservar mesa
-    </a>
-  </div>
-</template>
+      <a
+        href="#barra"
+        class="absolute top-[calc(100svh-4rem)] left-1/2 hidden -translate-x-1/2 items-center gap-2 text-sm text-crema-suave transition-colors duration-700 ease-fluid hover:text-crema md:flex"
+      >
+        Desliza para recorrer el restaurante
+        <ArrowDown class="size-4" aria-hidden="true" />
+      </a>
+    </article>
 
-<!-- 05 · La cocina: trío de valores -->
-<template id="sw-copy-cocina">
-  <p class="text-xs tracking-[0.14em] text-crema-suave uppercase">
-    {counter(4)} <span class="text-teja">•</span> La cocina
-  </p>
-  <p class="mt-4 text-sm tracking-[0.14em] text-teja uppercase">Elaboración</p>
-  <h2 class="mt-4 text-4xl md:text-6xl">Preparado al momento</h2>
-  <p class="mt-4 text-base text-crema-suave md:text-lg">
-    Elaboramos cada plato de forma artesanal, cuidando lo que más importa.
-  </p>
-  <p class="mt-8 flex flex-wrap items-baseline gap-x-4 gap-y-2 font-display text-3xl md:text-5xl">
-    <span>Producto</span><span class="text-teja" aria-hidden="true">·</span>
-    <span>Sabor</span><span class="text-teja" aria-hidden="true">·</span>
-    <span>Textura</span>
-  </p>
-  <a
-    href="#carta"
-    class="mt-8 inline-flex items-center gap-2 text-base font-medium text-crema transition-colors duration-700 ease-fluid hover:text-teja"
-  >
-    Ver platos de la carta
-    <ArrowRight class="size-4" aria-hidden="true" />
-  </a>
-</template>
+    {/* 2 · La barra */}
+    <article id="barra" class="h-[150svh]" data-stop="1" data-time={stops[1].time} aria-labelledby="barra-title">
+      <div class="sticky top-0 flex h-svh items-end px-4 pb-6 md:items-center md:px-16 md:pb-0">
+        <div class:list={[card, 'max-w-xl']} data-stop-card>
+          <p class="text-sm text-teja">La barra</p>
+          <h2 id="barra-title" class="mt-3 text-3xl md:text-5xl">Luz cálida al entrar</h2>
+          <p class="mt-4 text-base text-crema-suave">
+            Te recibe una barra iluminada desde abajo, con las botellas y las copas a la vista.
+          </p>
+        </div>
+      </div>
+    </article>
+
+    {/* 3 · La sala */}
+    <article id="sala" class="h-[150svh]" data-stop="2" data-time={stops[2].time} aria-labelledby="sala-title">
+      <div class="sticky top-0 flex h-svh items-end px-4 pb-6 md:items-center md:px-16 md:pb-0">
+        <div class:list={[card, 'max-w-xl']} data-stop-card>
+          <p class="text-sm text-teja">La sala</p>
+          <h2 id="sala-title" class="mt-3 text-3xl md:text-5xl">Japón, con acento mediterráneo y peruano</h2>
+          <p class="mt-4 text-base text-crema-suave">
+            Partimos de la cocina japonesa y la cruzamos con sabores mediterráneos y peruanos: sushi atrevido, innovador y
+            detallista.
+          </p>
+        </div>
+      </div>
+    </article>
+
+    {/* 4 · El comedor */}
+    <article id="comedor" class="h-[150svh]" data-stop="3" data-time={stops[3].time} aria-labelledby="comedor-title">
+      <div class="sticky top-0 flex h-svh items-end px-4 pb-6 md:items-center md:px-16 md:pb-0">
+        <div class:list={[card, 'max-w-xl']} data-stop-card>
+          <p class="text-sm text-teja">El comedor</p>
+          <h2 id="comedor-title" class="mt-3 text-3xl md:text-5xl">Reserva para dos o para todo el grupo</h2>
+          <p class="mt-4 text-base text-crema-suave">
+            Reserva desde la web. Si sois más de {CONTACT.groupThreshold} personas, llámanos al{' '}
+            <a href={CONTACT.phoneHref} class="text-crema underline decoration-teja underline-offset-4 transition-colors duration-700 ease-fluid hover:text-teja">
+              {CONTACT.phoneDisplay}
+            </a>.
+          </p>
+        </div>
+      </div>
+    </article>
+
+    {/* 5 · La cocina */}
+    <article id="cocina" class="h-[150svh]" data-stop="4" data-time={stops[4].time} aria-labelledby="cocina-title">
+      <div class="sticky top-0 flex h-svh items-end px-4 pb-6 md:items-center md:px-16 md:pb-0">
+        <div class:list={[card, 'max-w-xl']} data-stop-card>
+          <p class="text-sm text-teja">La cocina</p>
+          <h2 id="cocina-title" class="mt-3 text-3xl md:text-5xl">Preparado al momento</h2>
+          <p class="mt-4 text-base text-crema-suave">
+            Elaboramos cada plato de forma artesanal, cuidando el producto, el sabor y el contraste de texturas.
+          </p>
+          <a
+            href="#carta"
+            class="mt-6 inline-flex items-center gap-2 text-base font-medium text-crema transition-colors duration-700 ease-fluid hover:text-teja"
+          >
+            Ver platos de la carta
+            <ArrowRight class="size-4" aria-hidden="true" />
+          </a>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
 
 <script>
   import { initWorld } from '../scripts/world';
