@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Logo from '../assets/brand/logo-sushiber.svg';
+import { LINKS } from '../data/sushiber';
+---
+
+<Layout title="Página no encontrada | Sushiber" description="La página que buscas no existe." noindex>
+  <main id="contenido" class="flex min-h-svh flex-col items-center justify-center gap-8 px-4 text-center">
+    <a href="/" aria-label="Sushiber, volver al inicio" class="text-crema">
+      <Logo class="h-4 w-auto" aria-hidden="true" />
+    </a>
+    <h1 class="max-w-[680px] text-4xl md:text-6xl">No encontramos esta página</h1>
+    <p class="max-w-md text-base text-crema-suave">Puede que el enlace haya cambiado. Vuelve al inicio o reserva tu mesa directamente.</p>
+    <div class="flex flex-wrap items-center justify-center gap-6">
+      <a
+        href="/"
+        class="rounded-full border border-crema/20 px-3 py-2 text-base font-medium transition-all duration-700 ease-fluid hover:bg-crema/5 active:scale-[0.98]"
+      >
+        Volver al inicio
+      </a>
+      <a
+        href={LINKS.reservar}
+        class="rounded-full bg-teja px-3 py-2 text-base font-medium text-tinta transition-all duration-700 ease-fluid hover:bg-teja-claro active:scale-[0.98]"
+      >
+        Reservar mesa
+      </a>
+    </div>
+  </main>
+</Layout>

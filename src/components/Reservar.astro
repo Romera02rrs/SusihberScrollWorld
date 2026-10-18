@@ -1,0 +1,87 @@
+---
+import { Picture } from 'astro:assets';
+import CalendarCheck from '@phosphor-icons/core/assets/regular/calendar-check.svg';
+import UsersThree from '@phosphor-icons/core/assets/regular/users-three.svg';
+import MapPin from '@phosphor-icons/core/assets/regular/map-pin.svg';
+import WhatsappLogo from '@phosphor-icons/core/assets/regular/whatsapp-logo.svg';
+import mesas from '../assets/photos/04-Mesas.webp';
+import { CONTACT, LINKS } from '../data/sushiber';
+
+const steps = [
+  { icon: CalendarCheck, title: 'Elige día y hora', text: 'En nuestro sistema de reservas online.' },
+  {
+    icon: UsersThree,
+    title: `¿Más de ${CONTACT.groupThreshold} personas?`,
+    text: `Reserva por teléfono en el ${CONTACT.phoneDisplay}.`,
+    href: CONTACT.phoneHref,
+  },
+  { icon: MapPin, title: 'Ven a vernos', text: `${CONTACT.street}, ${CONTACT.postalCode} ${CONTACT.city} (${CONTACT.region}).`, href: LINKS.maps },
+];
+---
+
+<section id="reservar" aria-labelledby="reservar-title" class="px-4 py-24 md:px-8">
+  <div class="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2 md:gap-16">
+    <div class="mx-auto w-full max-w-sm overflow-hidden rounded-t-full" data-reveal>
+      <Picture
+        src={mesas}
+        formats={['avif', 'webp']}
+        fallbackFormat="webp"
+        widths={[384, 765]}
+        sizes="(min-width: 768px) 384px, 100vw"
+        alt="Comedor de Sushiber con mesas redondas de madera y una hornacina en arco iluminada en rojo"
+        class="aspect-[3/4] w-full object-cover"
+      />
+    </div>
+
+    <div>
+      <div data-reveal>
+        <p class="text-sm text-teja">Reservas</p>
+        <h2 id="reservar-title" class="mt-3 text-4xl md:text-5xl">Reserva tu mesa en tres pasos</h2>
+      </div>
+
+      <ol class="mt-8 flex flex-col gap-4">
+        {
+          steps.map((step, i) => (
+            <li class="flex gap-4 rounded-3xl border border-crema/10 p-6" data-reveal>
+              <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-crema/5 text-teja">
+                <step.icon class="size-5" aria-hidden="true" />
+              </span>
+              <div>
+                <h3 class="font-sans text-base font-medium">
+                  <span class="sr-only">Paso {i + 1}: </span>
+                  {step.title}
+                </h3>
+                {step.href ? (
+                  <a
+                    href={step.href}
+                    class="mt-1 block text-sm text-crema-suave underline decoration-crema/20 underline-offset-4 transition-colors duration-700 ease-fluid hover:text-crema hover:decoration-teja"
+                  >
+                    {step.text}
+                  </a>
+                ) : (
+                  <p class="mt-1 text-sm text-crema-suave">{step.text}</p>
+                )}
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="mt-8 flex flex-wrap items-center gap-6" data-reveal>
+        <a
+          href={LINKS.reservar}
+          class="rounded-full bg-teja px-3 py-2 text-base font-medium text-tinta transition-all duration-700 ease-fluid hover:scale-[1.03] hover:bg-teja-claro active:scale-[0.98]"
+        >
+          Reservar mesa
+        </a>
+        <a
+          href={LINKS.whatsapp}
+          class="inline-flex items-center gap-2 text-sm text-crema-suave transition-colors duration-700 ease-fluid hover:text-crema"
+        >
+          <WhatsappLogo class="size-4" aria-hidden="true" />
+          ¿Dudas antes de reservar? Escríbenos
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

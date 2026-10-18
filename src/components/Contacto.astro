@@ -1,0 +1,45 @@
+---
+import MapPin from '@phosphor-icons/core/assets/regular/map-pin.svg';
+import Phone from '@phosphor-icons/core/assets/regular/phone.svg';
+import WhatsappLogo from '@phosphor-icons/core/assets/regular/whatsapp-logo.svg';
+import EnvelopeSimple from '@phosphor-icons/core/assets/regular/envelope-simple.svg';
+import InstagramLogo from '@phosphor-icons/core/assets/regular/instagram-logo.svg';
+import { CONTACT, LINKS } from '../data/sushiber';
+
+const items = [
+  { icon: MapPin, label: `${CONTACT.street}, ${CONTACT.postalCode} ${CONTACT.city} (${CONTACT.region})`, href: LINKS.maps },
+  { icon: Phone, label: CONTACT.phoneDisplay, href: CONTACT.phoneHref },
+  { icon: WhatsappLogo, label: 'WhatsApp', href: LINKS.whatsapp },
+  { icon: EnvelopeSimple, label: CONTACT.email, href: `mailto:${CONTACT.email}` },
+  { icon: InstagramLogo, label: '@sushiberdenia', href: LINKS.instagram },
+];
+---
+
+<section id="contacto" aria-labelledby="contacto-title" class="px-4 py-24 md:px-8">
+  <div class="mx-auto max-w-6xl text-center" data-reveal>
+    <h2 id="contacto-title" class="mx-auto max-w-[680px] text-4xl md:text-6xl">Te esperamos en Dénia</h2>
+    <p class="mx-auto mt-6 max-w-xl text-base text-crema-suave md:text-lg">
+      Cocina japonesa fusión, elaborada al momento. Reserva tu mesa y ven a probarla.
+    </p>
+    <a
+      href={LINKS.reservar}
+      class="mt-8 inline-block rounded-full bg-teja px-3 py-2 text-base font-medium text-tinta transition-all duration-700 ease-fluid hover:scale-[1.03] hover:bg-teja-claro active:scale-[0.98]"
+    >
+      Reservar mesa
+    </a>
+  </div>
+
+  <address class="mx-auto mt-16 flex max-w-6xl flex-wrap justify-center gap-2" data-reveal>
+    {
+      items.map((item) => (
+        <a
+          href={item.href}
+          class="inline-flex items-center gap-2 rounded-full border border-crema/10 px-4 py-2 text-sm text-crema-suave transition-all duration-700 ease-fluid hover:border-crema/30 hover:text-crema active:scale-[0.98]"
+        >
+          <item.icon class="size-4 text-teja" aria-hidden="true" />
+          {item.label}
+        </a>
+      ))
+    }
+  </address>
+</section>

@@ -1,0 +1,39 @@
+---
+import Logo from '../assets/brand/logo-sushiber.svg';
+import InstagramLogo from '@phosphor-icons/core/assets/regular/instagram-logo.svg';
+import FacebookLogo from '@phosphor-icons/core/assets/regular/facebook-logo.svg';
+import { LEGAL, LINKS } from '../data/sushiber';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-crema/10 px-4 py-12 md:px-8">
+  <div class="mx-auto flex max-w-6xl flex-col gap-8 md:flex-row md:items-center md:justify-between">
+    <div class="flex items-center gap-6">
+      <a href="#top" aria-label="Sushiber, volver al inicio" class="text-crema transition-opacity duration-700 ease-fluid hover:opacity-70">
+        <Logo class="h-3 w-auto" aria-hidden="true" />
+      </a>
+      <a href={LINKS.instagram} aria-label="Instagram de Sushiber" class="text-crema-suave transition-colors duration-700 ease-fluid hover:text-crema">
+        <InstagramLogo class="size-5" aria-hidden="true" />
+      </a>
+      <a href={LINKS.facebook} aria-label="Facebook de Sushiber" class="text-crema-suave transition-colors duration-700 ease-fluid hover:text-crema">
+        <FacebookLogo class="size-5" aria-hidden="true" />
+      </a>
+    </div>
+
+    <nav aria-label="Legal">
+      <ul class="flex flex-wrap gap-x-6 gap-y-2">
+        {
+          LEGAL.map((link) => (
+            <li>
+              <a href={link.href} class="text-xs text-crema-suave transition-colors duration-700 ease-fluid hover:text-crema">
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+  <p class="mx-auto mt-8 max-w-6xl text-xs text-crema-suave">© {year} Sushiber · Dénia</p>
+</footer>

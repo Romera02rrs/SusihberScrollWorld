@@ -1,0 +1,20 @@
+---
+const lines = ['Sushi atrevido y detallista,', 'con sabores mediterráneos y peruanos.'];
+---
+
+<section aria-label="Nuestra propuesta" class="px-4 py-24 md:px-8">
+  <p class="mx-auto max-w-[680px] font-display text-4xl md:text-6xl">
+    {
+      lines.map((line, i) => (
+        <>
+          {line.split(' ').map((word) => (
+            <>
+              <span data-word>{word}</span>{' '}
+            </>
+          ))}
+          {i < lines.length - 1 && <br class="hidden md:block" />}
+        </>
+      ))
+    }
+  </p>
+</section>

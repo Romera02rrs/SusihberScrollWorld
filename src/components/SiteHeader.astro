@@ -1,0 +1,124 @@
+---
+import Logo from '../assets/brand/logo-sushiber.svg';
+import { LINKS } from '../data/sushiber';
+
+const nav = [
+  { href: '#recorrido', label: 'Recorrido' },
+  { href: '#carta', label: 'Carta' },
+  { href: '#reservar', label: 'Reservas' },
+  { href: '#contacto', label: 'Contacto' },
+];
+---
+
+<header class="pointer-events-none fixed inset-x-0 top-6 z-[80] flex justify-center px-4 md:justify-start md:px-6">
+  <div
+    class="pointer-events-auto flex w-max items-center gap-4 rounded-full border border-crema/10 bg-tinta/70 py-2 pr-2 pl-4 backdrop-blur-xl md:gap-6 md:pl-6"
+  >
+    <a href="#top" class="flex items-center text-crema transition-opacity duration-700 ease-fluid hover:opacity-70" aria-label="Sushiber, ir al inicio">
+      <Logo class="h-3 w-auto" aria-hidden="true" />
+    </a>
+
+    <nav aria-label="Principal" class="hidden md:block">
+      <ul class="flex items-center gap-4">
+        {
+          nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                data-nav-link
+                class="rounded-full px-2 py-1 text-sm text-crema-suave transition-colors duration-700 ease-fluid hover:text-crema aria-[current=true]:text-crema"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <a
+      href={LINKS.reservar}
+      class="rounded-full bg-teja px-3 py-2 text-sm font-medium text-tinta transition-all duration-700 ease-fluid hover:scale-[1.03] hover:bg-teja-claro active:scale-[0.98]"
+    >
+      Reservar mesa
+    </a>
+
+    <button
+      type="button"
+      data-menu-toggle
+      aria-expanded="false"
+      aria-controls="menu-movil"
+      aria-label="Abrir menú"
+      class="group relative flex size-10 items-center justify-center rounded-full transition-colors duration-700 ease-fluid hover:bg-crema/10 md:hidden"
+    >
+      <span
+        class="absolute h-px w-4 -translate-y-1 bg-crema transition-transform duration-700 ease-fluid group-aria-expanded:translate-y-0 group-aria-expanded:rotate-45"
+      ></span>
+      <span
+        class="absolute h-px w-4 translate-y-1 bg-crema transition-transform duration-700 ease-fluid group-aria-expanded:translate-y-0 group-aria-expanded:-rotate-45"
+      ></span>
+    </button>
+  </div>
+</header>
+
+<div
+  id="menu-movil"
+  data-menu
+  data-open="false"
+  class="group/menu invisible fixed inset-0 z-[75] flex flex-col justify-center bg-tinta/80 px-8 opacity-0 backdrop-blur-3xl transition-all duration-700 ease-fluid data-[open=true]:visible data-[open=true]:opacity-100 md:hidden"
+>
+  <nav aria-label="Menú móvil">
+    <ul class="flex flex-col gap-6">
+      {
+        nav.map((item, i) => (
+          <li class="overflow-hidden">
+            <a
+              href={item.href}
+              data-menu-link
+              class="block translate-y-12 font-display text-4xl text-crema opacity-0 transition-all duration-700 ease-fluid group-data-[open=true]/menu:translate-y-0 group-data-[open=true]/menu:opacity-100"
+              style={`transition-delay: ${100 + i * 50}ms`}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</div>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+
+  const setOpen = (open: boolean) => {
+    if (!toggle || !menu) return;
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+    menu.dataset.open = String(open);
+    document.documentElement.classList.toggle('overflow-hidden', open);
+  };
+
+  toggle?.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+  menu?.querySelectorAll('[data-menu-link]').forEach((link) => link.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') setOpen(false);
+  });
+
+  // Marca en la navegación la sección visible.
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-nav-link]')];
+  const sections = links
+    .map((link) => document.querySelector<HTMLElement>(link.getAttribute('href') ?? ''))
+    .filter((el): el is HTMLElement => Boolean(el));
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((link) => link.setAttribute('aria-current', String(link.getAttribute('href') === `#${entry.target.id}`)));
+      });
+    },
+    { rootMargin: '-45% 0px -50% 0px' },
+  );
+  sections.forEach((section) => observer.observe(section));
+</script>

@@ -1,0 +1,36 @@
+---
+import ArrowUpRight from '@phosphor-icons/core/assets/regular/arrow-up-right.svg';
+import { LINKS, PLATOS } from '../data/sushiber';
+---
+
+<section id="carta" aria-labelledby="carta-title" class="px-4 py-24 md:px-8">
+  <div class="mx-auto max-w-6xl">
+    <div class="max-w-[680px]" data-reveal>
+      <p class="text-sm text-teja">De la carta</p>
+      <h2 id="carta-title" class="mt-3 text-4xl md:text-5xl">Algunos platos para empezar</h2>
+      <p class="mt-4 text-base text-crema-suave">
+        Una selección de nuestra carta online. Pregunta por su disponibilidad en sala.
+      </p>
+    </div>
+
+    <ul class="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {
+        PLATOS.map((plato) => (
+          <li class="rounded-3xl border border-crema/10 bg-crema/[0.03] p-6" data-reveal>
+            <h3 class="text-2xl">{plato.name}</h3>
+            <p class="mt-3 text-sm text-crema-suave">{plato.description}</p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <a
+      href={LINKS.carta}
+      class="mt-12 inline-flex items-center gap-2 rounded-full border border-crema/20 px-3 py-2 text-base font-medium text-crema transition-all duration-700 ease-fluid hover:border-crema/40 hover:bg-crema/5 active:scale-[0.98]"
+      data-reveal
+    >
+      Ver carta
+      <ArrowUpRight class="size-4" aria-hidden="true" />
+    </a>
+  </div>
+</section>

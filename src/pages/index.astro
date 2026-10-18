@@ -1,11 +1,76 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import World from '../components/World.astro';
+import Tagline from '../components/Tagline.astro';
+import Carta from '../components/Carta.astro';
+import Reservar from '../components/Reservar.astro';
+import Bono from '../components/Bono.astro';
+import Faq from '../components/Faq.astro';
+import Contacto from '../components/Contacto.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { CONTACT, FAQ, LINKS } from '../data/sushiber';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Sin horario: pendiente de confirmar con el restaurante.
+const restaurant = {
+  '@context': 'https://schema.org',
+  '@type': 'Restaurant',
+  name: 'Sushiber',
+  url: 'https://sushiber.com',
+  servesCuisine: ['Japonesa', 'Fusión'],
+  telephone: '+34647617878',
+  email: CONTACT.email,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: CONTACT.street,
+    postalCode: CONTACT.postalCode,
+    addressLocality: CONTACT.city,
+    addressRegion: CONTACT.region,
+    addressCountry: 'ES',
+  },
+  acceptsReservations: LINKS.reservar,
+  hasMenu: LINKS.carta,
+  sameAs: [LINKS.instagram, LINKS.facebook, LINKS.tripadvisor],
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: { '@type': 'Answer', text: item.a },
+  })),
+};
 ---
 
-<Layout>
-	<Welcome />
+<Layout
+  title="Sushiber | Cocina japonesa fusión en Dénia"
+  description="Sushi creativo con influencias japonesas, mediterráneas y peruanas, elaborado al momento. Reserva tu mesa en Sushiber, Av. Juan Chabás 3, Dénia."
+>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(restaurant)} />
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} />
+
+  <SiteHeader />
+  <main id="contenido">
+    <World />
+    <!-- Por encima de las capas fijas del motor scroll-world (z 10–60) -->
+    <div class="relative z-[45] bg-tinta">
+      <Tagline />
+      <Carta />
+      <Reservar />
+      <Bono />
+      <Faq />
+      <Contacto />
+    </div>
+  </main>
+  <div class="relative z-[45] bg-tinta">
+    <SiteFooter />
+  </div>
 </Layout>
+
+<script>
+  import { initReveal, initTagline } from '../scripts/reveal';
+  initReveal();
+  initTagline();
+</script>
